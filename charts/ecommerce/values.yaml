@@ -1,0 +1,76 @@
+namespace: ecommerce
+imagePullPolicy: IfNotPresent
+
+config:
+  dbHost: postgres
+  dbPort: "5432"
+  dbName: auraweb_db
+  dbUser: auraweb_user
+  redisHost: redis
+  redisUrl: redis://redis:6379
+  rabbitmqUrl: amqp://rabbitmq:5672
+  logLevel: info
+  awsRegion: us-west-1
+  s3BucketName: ecommerce-prod-bucket
+
+secret:
+  dbPassword: CHANGE_ME_DB_PASSWORD
+  jwtSecret: CHANGE_ME_ACCESS_SECRET
+  jwtRefreshSecret: CHANGE_ME_REFRESH_SECRET
+  awsAccessKeyId: CHANGE_ME
+  awsSecretAccessKey: CHANGE_ME
+
+topologySpread:
+  enabled: true
+  topologyKey: topology.kubernetes.io/zone
+
+storageClass:
+  create: true
+  name: gp3-wait
+  provisioner: ebs.csi.aws.com
+  type: gp3
+
+stateful:
+  postgres:
+    enabled: true
+    image: postgres:16-alpine
+    replicas: 1
+    port: 5432
+    storage: 10Gi
+    storageClassName: gp3-wait
+
+  redis:
+    enabled: true
+    image: redis/redis-stack-server:latest
+    replicas: 1
+    port: 6379
+    storage: 5Gi
+    storageClassName: gp3-wait
+
+  rabbitmq:
+    enabled: true
+    image: rabbitmq:3-management-alpine
+    replicas: 1
+    port: 5672
+    managementPort: 15672
+    storage: 5Gi
+    storageClassName: gp3-wait
+
+services: {}
+
+ingress:
+  enabled: true
+  className: alb
+  host: ecommerce.example.com
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  cpuUtilization: 70

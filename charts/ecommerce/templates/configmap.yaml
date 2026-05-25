@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-config
+  namespace: {{ .Values.namespace }}
+data:
+  NODE_ENV: "production"
+  DB_HOST: {{ .Values.config.dbHost | quote }}
+  DB_PORT: {{ .Values.config.dbPort | quote }}
+  DB_NAME: {{ .Values.config.dbName | quote }}
+  DB_USER: {{ .Values.config.dbUser | quote }}
+  REDIS_HOST: {{ .Values.config.redisHost | quote }}
+  REDIS_URL: {{ .Values.config.redisUrl | quote }}
+  RABBITMQ_URL: {{ .Values.config.rabbitmqUrl | quote }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  JWT_EXPIRES_IN: "15m"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+  AWS_REGION: {{ .Values.config.awsRegion | quote }}
+  S3_BUCKET_NAME: {{ .Values.config.s3BucketName | quote }}
